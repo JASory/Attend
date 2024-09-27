@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Attendance
+Path=/opt/attendance/
+Exec=/opt/attendance/attend
+Terminal=false
+Icon=/opt/attendance/attend.png
