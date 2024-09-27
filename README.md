@@ -7,7 +7,9 @@ Installing requires building from source, to do that you need rustc, cargo, and 
 
 Clone the repository
 
-``` git clone https://github.com/JASory/Attend ```
+``` 
+git clone https://github.com/JASory/Attend
+```
 Then run the installer script
 
 ``` ./installer.sh ```
