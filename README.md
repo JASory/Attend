@@ -1,5 +1,5 @@
 # Attend
-GTK4 application for recording club attendance
+GTK4 application for recording club attendance, written for Mesa Community College associated student clubs
 
 # Installing
 
@@ -7,10 +7,10 @@ Installing requires building from source, to do that you need rustc, cargo, and 
 
 Clone the repository
 
-`` git clone https://github.com/JASory/Attend ``
+``` git clone https://github.com/JASory/Attend ```
 Then run the installer script
 
-`` ./installer.sh ``
+``` ./installer.sh ```
 If you use su rather than sudo then you will have to modify the installer script by commenting out the sudo lines and uncommenting the su line
 
 The program will be installed as well as a folder labeled "attendance" with a "attendees.csv" and a "members.dat" file in the user's home directory
@@ -18,7 +18,7 @@ The program will be installed as well as a folder labeled "attendance" with a "a
 Members.dat is a list of members and their information, to be used for quickly filling out an attendance form. The attendees.csv file is the list of people who are actually present and filled out the attendance form, members or not. 
 
 To delete you run the uninstall script
-`` ./uninstall.sh ``
+``` ./uninstall.sh ```
 Like the installer you may have to change the sudo lines to su
 
 The uninstaller does not delete the attendance folder with submitted data
