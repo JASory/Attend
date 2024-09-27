@@ -1,5 +1,5 @@
 # Attend
-GTK4 application for recording club attendance, written for Mesa Community College associated student clubs
+Basic GTK4 application for recording club attendance, written for Mesa Community College associated student clubs
 
 # Installing
 
