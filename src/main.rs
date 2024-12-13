@@ -30,6 +30,11 @@ const DATABASE : &str = "members.dat";
 const ATTENDEE : &str = "attendees.csv";
 const APP_NAME : &str = "Attendance Recorder";
 const SEPARATOR : &str = ",";
+const AUTHOR_NAME : &str = "J.A Sory";
+const PROGRAM_COMMENT : &str = "Application to assist in taking club attendance";
+const LICENSE : gtk4::License  = gtk4::License::Gpl30;
+
+
 
 #[derive(Clone)]
 struct Data{
@@ -56,9 +61,9 @@ impl Data{
 }
 
 
-fn retrieve(conf: String) -> Vec<Data>{
+fn retrieve(locale: String) -> Vec<Data>{
   
-  let dbase = std::fs::File::open(conf+DATABASE).unwrap();
+  let dbase = std::fs::File::open(locale).unwrap();
   
   let d_reader = BufReader::new(dbase);
   
@@ -96,18 +101,97 @@ fn retrieve(conf: String) -> Vec<Data>{
 
   }
 
+fn add_actions(
+    application: &gtk4::Application,
+    window: &gtk4::ApplicationWindow,
+) {
+    let about = gtk4::gio::SimpleAction::new("about", None);
+    about.connect_activate(clone!(@weak window => move |_, _| {
+        let p = gtk4::AboutDialog::new();
+        p.set_authors(&[AUTHOR_NAME]);
+        p.set_license_type(LICENSE);
+        //p.set_logo(None);
+        p.set_logo_icon_name(None);
+        p.set_program_name(Some(APP_NAME));
+        p.set_copyright(Some("© 2024 J.A Sory"));
+        p.set_version(Some("1.0.0"));
+        p.set_comments(Some(PROGRAM_COMMENT));
+        p.set_transient_for(Some(&window));
+        p.show();
+    }));
+   
+    let present = gtk4::gio::SimpleAction::new("present", None);
+    
+    present.connect_activate(
+      clone!(@weak window => move |_, _| {
+    
+            let conf = std::fs::read_to_string(CONFIG).unwrap().trim().to_string();
+            let dataset = retrieve(conf+ATTENDEE);
+            let mut veccy = vec![];
+            
+                for i in dataset{
+                  veccy.push(i.name)
+                }
+                
+                let textout = veccy.join("\n");
+                
+        let textbuff = gtk4::TextBuffer::builder()
+                       .text(&textout)
+                       .build();
+                       
+        let textview = gtk4::TextView::builder()
+                       .buffer(&textbuff)
+                       .build();
+        
+                let p = gtk4::Dialog::builder()
+                        .default_widget(&textview)
+                        .build();
+                        
+        p.set_title(Some("Attendees"));
+        p.set_child(Some(&textview));
+        p.set_transient_for(Some(&window));
+        p.show();
+    }));
+
+    application.add_action(&about);
+    application.add_action(&present);
+
+}
+
+fn build_header_menu(header: &gtk4::HeaderBar){
+     let menu = gtk4::gio::Menu::new();
+        menu.append(Some("Present List"),Some("app.present"));
+        menu.append(Some("About"), Some("app.about"));
+        let p = gtk4::MenuButton::new();
+        p.set_menu_model(Some(&menu));
+        header.pack_end(&p);
+ }
+
+  
+
 fn build_ui(application: &gtk4::Application) {
 
     let window = gtk4::ApplicationWindow::new(application);
-    window.set_title(Some(APP_NAME));
+
     window.set_default_size(600,400);
     
+    let header_title = gtk4::Label::new(Some(APP_NAME));
+    
+    let top = gtk4::HeaderBar::builder()
+                  .show_title_buttons(true)
+                  .title_widget(&header_title)
+                  .build();
+ 
+   build_header_menu(&top);    
+    
+   window.set_titlebar(Some(&top));
     
     let name_entry = gtk4::Entry::new();
     let meid_entry = gtk4::Entry::new();
     let email_entry = gtk4::Entry::new();
     
     email_entry.set_placeholder_text(Some("Optional"));
+    
     let lookup_button = gtk4::Button::with_label("Lookup");
     let submit_button = gtk4::Button::with_label("Submit");
     let button_space = gtk4::Label::new(None);
@@ -127,7 +211,7 @@ fn build_ui(application: &gtk4::Application) {
    // Read the file pointing to where the data files are 
     let conf = std::fs::read_to_string(CONFIG).unwrap().trim().to_string();
     
-    let dataset = retrieve(conf.clone());
+    let dataset = retrieve(conf.clone()+DATABASE);
     
     let ls = name_completion(&dataset);
     
@@ -205,7 +289,8 @@ fn build_ui(application: &gtk4::Application) {
     
     window.set_child(Some(&row));
 
-
+    add_actions(application,&window);
+    
     window.present();
 
 }
@@ -215,7 +300,7 @@ fn build_ui(application: &gtk4::Application) {
 fn main() -> glib::ExitCode{
 
     let application = gtk4::Application::builder()
-        .application_id("attendance")
+        .application_id("com.github.jasory.attendance")
         .build();
 
     application.connect_activate(build_ui);
