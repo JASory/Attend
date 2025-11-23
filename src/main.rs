@@ -106,7 +106,7 @@ fn add_actions(
     window: &gtk4::ApplicationWindow,
 ) {
     let about = gtk4::gio::SimpleAction::new("about", None);
-    about.connect_activate(clone!(@weak window => move |_, _| {
+    about.connect_activate(clone!(#[weak] window, move |_, _| {
         let p = gtk4::AboutDialog::new();
         p.set_authors(&[AUTHOR_NAME]);
         p.set_license_type(LICENSE);
@@ -123,7 +123,7 @@ fn add_actions(
     let present = gtk4::gio::SimpleAction::new("present", None);
     
     present.connect_activate(
-      clone!(@weak window => move |_, _| {
+      clone!(#[weak] window, move |_, _| {
     
             let conf = std::fs::read_to_string(CONFIG).unwrap().trim().to_string();
             let dataset = retrieve(conf+ATTENDEE);
@@ -245,7 +245,7 @@ fn build_ui(application: &gtk4::Application) {
   let out = std::fs::OpenOptions::new().create(true).append(true).open(conf+ATTENDEE).unwrap();
   let ofile = RefCell::new(out);
   
-    submit_button.connect_clicked(clone!(@weak name_entry, @weak meid_entry, @weak email_entry => move |_|{
+    submit_button.connect_clicked(clone!(#[weak] name_entry, #[weak] meid_entry,#[weak] email_entry, move |_|{
         let name = name_entry.text().to_string();
         let meid = meid_entry.text().to_string();
         let email = email_entry.text().to_string();
@@ -263,7 +263,7 @@ fn build_ui(application: &gtk4::Application) {
     
     let dset = dataset.clone();
     
-     lookup_button.connect_clicked(clone!(@weak name_entry, @weak meid_entry, @weak email_entry => move |_|{    
+     lookup_button.connect_clicked(clone!(#[weak] name_entry, #[weak] meid_entry, #[weak] email_entry, move |_|{    
      let name = name_entry.text();
      match search_name(&dset,name.to_string()){
        Some(x) =>{
@@ -276,7 +276,7 @@ fn build_ui(application: &gtk4::Application) {
      
     let dset2 = dataset.clone();
     
-    name_entry.connect_activate(clone!(@weak name_entry, @weak meid_entry, @weak email_entry => move |name|{
+    name_entry.connect_activate(clone!(#[weak] meid_entry,#[weak] email_entry, move |name|{
      
      match search_name(&dset2,name.text().to_string()){
        Some(x) =>{
